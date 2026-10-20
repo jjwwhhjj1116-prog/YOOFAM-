@@ -1,7 +1,16 @@
 # 무협 오디오북 TTS + 영상 매칭 파이프라인
 
-대본을 **이중 TTS**(나레이션=ElevenLabs / 대사=Supertone)로 음성 변환하고,
-장면별로 **영상 길이를 오디오에 맞추고 자막(.srt)까지** 자동 생성하는 도구.
+> **통합·개발자용 문서는 [CODEX_GUIDE.md](CODEX_GUIDE.md) 를 먼저 읽으세요.**
+> 구조·입력 형식·엔진 추상화·재생성 방지·CapCut 내보내기·불변 규칙이 거기 정리돼 있습니다.
+
+대본을 **이중 TTS**로 음성 변환하고, 장면별로 **영상 길이를 오디오에 맞추고
+자막(.srt)까지** 자동 생성한 뒤 **CapCut 초안 프로젝트**로 내보내는 도구.
+
+- 나레이션 = ElevenLabs (목소리 클론)
+- 대사 = 타입캐스트(기본) / ElevenLabs / **Gemini** / Supertone(2026-08-31 종료)
+
+⚠️ 아래 본문 일부는 작성 시점(대사=Supertone, 키 2개) 기준이라 오래됐습니다.
+   현재 기준은 CODEX_GUIDE.md 를 보세요.
 
 ---
 
@@ -12,7 +21,7 @@ TTS+영상 변환기/
 ├─ tts_pipeline.py       ← 메인 스크립트
 ├─ voice_map.json        ← 역할 ↔ 성우 (영구 고정, 작품 바뀌어도 유지)
 ├─ character_cast.json   ← 캐릭터 ↔ 역할 (작품마다 교체)
-├─ .env                  ← API 키 2개 (ELEVENLABS / SUPERTONE)
+├─ .env                  ← API 키 (ELEVENLABS / TYPECAST / GEMINI / SUPERTONE)
 ├─ 대본.txt              ← ★ 여기에 대본을 넣는다 (파일명 자유)
 │
 ├─ 영상클립/             ← ★ Flow 영상을 001.mp4, 002.mp4 … 로 넣는다

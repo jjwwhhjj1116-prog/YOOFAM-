@@ -1,0 +1,208 @@
+{
+  "_설명": "각 역할의 voice_id는 Supertone 대사 성우 voice_id입니다 (나레이션만 ElevenLabs). 값은 수정 금지 — 역할↔voice_id는 영구 고정. 캐릭터↔역할 배정은 character_cast.json에서 관리.",
+  "나레이션": {
+    "voice_id": "9m69BVPMQkvdr5VPGuBg",
+    "engine": "elevenlabs",
+    "settings": {
+      "model_id": "eleven_flash_v2_5",
+      "stability": 0.6,
+      "similarity_boost": 0.75,
+      "style": 0.2,
+      "use_speaker_boost": true,
+      "speed": 0.9,
+      "language_code": "ko"
+    }
+  },
+  "남주": {
+    "voice_id": "ab7cd18e645b54d7536e0f",
+    "el_voice_id": "L5Z7XbAMGeBmEiXhz9y5",
+    "_el": "무협(종욱) — 청년 주인공",
+    "tc_voice_id": "tc_65e02cd537dfdac4257ca957",
+    "_tc": "Risan Ji · 청년남 · 주인공",
+    "gm_voice_id": "Orus",
+    "gm_note": "실측 감정반응 14.5st · 평온115Hz · 일치 98.1% · 남주 · 상"
+  },
+  "여주": {
+    "voice_id": "f32a02422bd88da70fddb2",
+    "el_voice_id": "pFZP5JQG7iQjIQuC4Bku",
+    "_el": "Lily - Velvety Actress — 여성",
+    "tc_voice_id": "tc_667ce80314cb3a612d6959e8",
+    "_tc": "Hyemin · 청년여 · 여주인공",
+    "gm_voice_id": "Erinome",
+    "gm_note": "실측 감정반응 8.1st · 평온162Hz · 일치 97.4% · 여주1 · 중 · 여성 중 최고"
+  },
+  "여주2": {
+    "voice_id": "f4a2a3f41fc82de8616b84",
+    "el_voice_id": "NbkKnEAZ7Bqw4EAkVEaz",
+    "_el": "Olivia J - Confident — 여성",
+    "tc_voice_id": "tc_667ce80314cb3a612d6959e8",
+    "_tc": "(폴백) Hyemin · 청년여 · 여주인공",
+    "gm_voice_id": "Achernar",
+    "gm_note": "실측 감정반응 6.6st · 평온163Hz · 일치 97.8% · 여주2 · 중"
+  },
+  "노인": {
+    "voice_id": "db26b7e1720e0812dd8979",
+    "el_voice_id": "pqHfZKP75CvOlQylNhV4",
+    "_el": "Bill - Wise, Mature — 노년",
+    "tc_voice_id": "tc_67e38d8c771b5511659c4534",
+    "_tc": "Jongdae · 노년남 · 노인/장로",
+    "gm_voice_id": "Schedar",
+    "gm_note": "실측 감정반응 14.7st · 평온91Hz · 일치 98.1% · 노인1 · 상 · 호통치는 장로"
+  },
+  "노인2": {
+    "voice_id": "c3c0898fd41489a8e8919c",
+    "el_voice_id": "V2bPluzT7MuirpucVAKH",
+    "_el": "Bill Adams - Wise — 노년",
+    "tc_voice_id": "tc_685ca2dcfa58f44bdbe60d65",
+    "_tc": "Wade · 중년남 · 장문인/천하제일인",
+    "gm_voice_id": "Sadaltager",
+    "gm_note": "실측 감정반응 14.2st · 평온95Hz · 일치 97.0% · 노인2 · 상"
+  },
+  "남자1": {
+    "voice_id": "751ba7d5af37a49d68f2a7",
+    "_나이": "중년(40대) · Kan",
+    "el_voice_id": "meBWVwOw9dPkR2H0emM9",
+    "_el": "무협(중후_기본) — 중년",
+    "tc_voice_id": "tc_63f7167e54b37fb5326409d1",
+    "_tc": "Touma Murata · 청년남 · 청년",
+    "gm_voice_id": "Alnilam",
+    "gm_note": "실측 감정반응 14.2st · 평온108Hz · 일치 99.3% · 중년1 · 상"
+  },
+  "남자2": {
+    "voice_id": "12bab70236ce079bb0e4ea",
+    "_나이": "청년(20~30대) · Taeyang",
+    "el_voice_id": "bgqvusmawbfsSsoi58jH",
+    "_el": "무협(VER.4) — 청년",
+    "tc_voice_id": "tc_66d000ee0742c43c93a0ada1",
+    "_tc": "Dohyun · 청년남 · 남주2",
+    "gm_voice_id": "Zubenelgenubi",
+    "gm_note": "실측 감정반응 17.2st · 평온86Hz · 일치 100.0% · 청년1 · 상 · 묵직한 청년"
+  },
+  "남자3": {
+    "voice_id": "58662d5bd86d1b7837f197",
+    "_나이": "중년(40대) · Diego",
+    "el_voice_id": "3RAo66HM4gphoVumqGbL",
+    "_el": "무협(중후_2) — 중년",
+    "tc_voice_id": "tc_63622aaa4109052e8067e303",
+    "_tc": "Homun Sim · 중년남 · 바보/코믹",
+    "gm_voice_id": "Charon",
+    "gm_note": "실측 감정반응 10.0st · 평온113Hz · 일치 100.0% · 중년2 · 중"
+  },
+  "남자4": {
+    "voice_id": "a13c0466d81ceee983dbdb",
+    "_나이": "청년(20~30대) · Zyros",
+    "el_voice_id": "SA4zUvfFJFUNQSa1Gxot",
+    "_el": "무협(종욱_ver2) — 청년",
+    "tc_voice_id": "tc_63f7167e54b37fb5326409d1",
+    "_tc": "(폴백) Touma Murata · 청년남 · 청년",
+    "gm_voice_id": "Iapetus",
+    "gm_note": "실측 감정반응 9.5st · 평온119Hz · 일치 100.0% · 청년2 · 중 · 밝은 청년"
+  },
+  "여전사": {
+    "voice_id": "9e3cd9db97a12963af58d1",
+    "el_voice_id": "XrExE9yKIg1WjnnlVkGX",
+    "_el": "Matilda - Professional — 여성",
+    "tc_voice_id": "tc_60478557f12456064b353409",
+    "_tc": "Valkyrie · 청년여 · 여전사",
+    "gm_voice_id": "Vindemiatrix",
+    "gm_note": "실측 감정반응 5.5st · 평온151Hz · 일치 98.9% · 여전사 · 하중 · 여성 중 가장 낮은 음역"
+  },
+  "여주3": {
+    "voice_id": "b6c59d12355a00040d70a1",
+    "_나이": "청년(20~30대)·여 · Akari",
+    "el_voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+    "_el": "Alice - Clear — 여성",
+    "tc_voice_id": "tc_667ce80314cb3a612d6959e8",
+    "_tc": "(폴백) Hyemin · 청년여 · 여주인공",
+    "gm_voice_id": "Despina",
+    "gm_note": "실측 감정반응 5.7st · 평온164Hz · 일치 98.9% · 여주3 · 하중"
+  },
+  "남자5": {
+    "voice_id": "32d43349abb5df0c414df1",
+    "_나이": "청년(20~30대) · Evan",
+    "el_voice_id": "ZqUhe5bwPMTVTmM4Mmqr",
+    "_el": "무협(리믹스) — 청년",
+    "tc_voice_id": "tc_66d000ee0742c43c93a0ada1",
+    "_tc": "(폴백) Dohyun · 청년남 · 남주2",
+    "gm_voice_id": "Achird",
+    "gm_note": "실측 감정반응 9.8st · 평온102Hz · 일치 100.0% · 청년3 · 중"
+  },
+  "노인3": {
+    "voice_id": "816bc977b4111a3034146a",
+    "_나이": "노년 · Bert",
+    "el_voice_id": "fjnwTZkKtQOJaYzGLa6n",
+    "_el": "William - Dramatic — 노년",
+    "tc_voice_id": "tc_67e38d8c771b5511659c4534",
+    "_tc": "(폴백) Jongdae · 노년남 · 노인/장로",
+    "gm_voice_id": "Rasalgethi",
+    "gm_note": "실측 감정반응 8.7st · 평온112Hz · 일치 100.0% · 노인3 · 중"
+  },
+  "노인4": {
+    "voice_id": "8defc488f52f5efb9901f7",
+    "_나이": "노년 · Osman",
+    "el_voice_id": "Ix8C14HEHgIQkJswik2o",
+    "_el": "PETER BAKER - Deep — 노년",
+    "tc_voice_id": "tc_685ca2dcfa58f44bdbe60d65",
+    "_tc": "(폴백) Wade · 중년남 · 장문인/천하제일인",
+    "gm_voice_id": "Gacrux",
+    "gm_note": "실측 감정반응 4.2st · 평온124Hz · 일치 98.1% · 노인4 · 하 · 담담한 노인 전용(의도적)"
+  },
+  "악역": {
+    "voice_id": "0b3980faa5cb6675d40430",
+    "settings": {
+      "speed": 1.05
+    },
+    "el_voice_id": "IZ3Sd2AggFAc4Rd9EFXM",
+    "_el": "무협(종욱_성숙) — 중년 악역",
+    "tc_voice_id": "tc_63f7168722ebe13991293cde",
+    "_tc": "Teal · 중년남 · 대악역",
+    "gm_voice_id": "Enceladus",
+    "gm_note": "실측 감정반응 18.2st · 평온75Hz · 일치 100.0% · 악역1 · 상 · 음험하게 깔리는 결"
+  },
+  "악역2": {
+    "voice_id": "3ff478bf89c862a4a9ee69",
+    "settings": {
+      "speed": 1.05
+    },
+    "el_voice_id": "HmP66MxEVHW6NrrH9WQM",
+    "_el": "깊고 중후한 전설의 고수 — 중년 악역",
+    "tc_voice_id": "tc_61095ebc03c0e5b98f8ba69c",
+    "_tc": "Sindarin · 노년남 · 간사한 악역",
+    "gm_voice_id": "Algieba",
+    "gm_note": "실측 감정반응 17.9st · 평온76Hz · 일치 99.6% · 악역2 · 상 · 런별 편차 큼(9.2~17.9)"
+  },
+  "악역3": {
+    "voice_id": "a929cf8981cbfd9b8e6eb3",
+    "settings": {
+      "speed": 1.05
+    },
+    "el_voice_id": "LUYXgIQdRRbvgM8OQsy8",
+    "_el": "YOO(무협) — 악역",
+    "tc_voice_id": "tc_61095ebc03c0e5b98f8ba69c",
+    "_tc": "(폴백) Sindarin · 노년남 · 간사한 악역",
+    "gm_voice_id": "Algenib",
+    "gm_note": "실측 감정반응 13.6st · 평온101Hz · 일치 98.9% · 악역3 · 상 · 거친 결"
+  },
+  "악역4": {
+    "voice_id": "a1a8c25b18309e96472109",
+    "settings": {
+      "speed": 1.05
+    },
+    "el_voice_id": "4aoc5wDzKcOznxhKw4iV",
+    "_el": "무협(확인용) — 악역",
+    "tc_voice_id": "tc_63f7168722ebe13991293cde",
+    "_tc": "(폴백) Teal · 중년남 · 대악역",
+    "gm_voice_id": "Pulcherrima",
+    "gm_note": "실측 감정반응 12.8st · 평온114Hz · 일치 97.4% · 악역4 · 중상 · 공격적인 결"
+  },
+  "_설명2": "el_voice_id = 대사를 ElevenLabs로 만들 때 쓰는 voice_id (Supertone 종료 2026-08-31 대비). voice_id(슈퍼톤)는 무수정.",
+  "_설명3": "tc_voice_id = 타입캐스트(대사) voice_id. Supertone voice_id·ElevenLabs el_voice_id는 그대로 보존.",
+  "_설명_gemini": "gm_voice_id = Gemini TTS 프리빌트 보이스. 전 역할 실측 완료(2026-10). 감정반응도는 '등급'으로만 보라 — 같은 보이스도 런마다 흔들린다(Algieba 9.2~17.9st). 상 13st↑ / 중 6~13 / 하 6↓. 감정은 gemini_engine.EMO_STYLE 이 한국어 연기 지시문으로 바꿔 Part.speech_metadata 로 전달한다.",
+  "_설명_gemini_제외": {
+    "Sulafat": "2.7st — 연기 안 함",
+    "Kore": "3.2st — 연기 거의 안 함",
+    "Fenrir": "2.8st — 연기 안 함",
+    "Leda": "4.1st — 약함",
+    "Umbriel": "10.6st — 쓸만하나 악역 슬롯 부족"
+  }
+}

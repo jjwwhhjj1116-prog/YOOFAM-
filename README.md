@@ -7,7 +7,7 @@
 자막(.srt)까지** 자동 생성한 뒤 **CapCut 초안 프로젝트**로 내보내는 도구.
 
 - 나레이션 = ElevenLabs (목소리 클론)
-- 대사 = 타입캐스트(기본) / ElevenLabs / **Gemini** / Supertone(2026-08-31 종료)
+- 대사 = **Gemini**(기본) / 타입캐스트 / ElevenLabs / Supertone(2026-08-31 종료)
 
 ⚠️ 아래 본문 일부는 작성 시점(대사=Supertone, 키 2개) 기준이라 오래됐습니다.
    현재 기준은 CODEX_GUIDE.md 를 보세요.

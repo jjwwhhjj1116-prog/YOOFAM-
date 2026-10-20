@@ -82,8 +82,8 @@ UI는 Gradio 웹앱(`app.py`, `127.0.0.1:7860`)이고
 | `tts_pipeline.py` | **엔진 본체.** 파싱·역할배정·감정매핑·TTS생성·영상정렬·자막 |
 | `app.py` | Gradio UI. 위저드 4단계, 미리보기, 매핑 확정 |
 | `capcut_export.py` | CapCut draft 프로젝트 생성 (**통합 핵심 지점**) |
-| `gemini_engine.py` | 대사 엔진 — Gemini TTS |
-| `typecast_engine.py` | 대사 엔진 — 타입캐스트 (현재 기본) |
+| `gemini_engine.py` | 대사 엔진 — Gemini TTS (**현재 기본**) |
+| `typecast_engine.py` | 대사 엔진 — 타입캐스트 |
 | `flow_pipeline.py` | Google Flow(이미지/영상 생성) 프롬프트 내보내기·가져오기 |
 | `yadam_pipeline.py` / `keizai_pipeline.py` | 다른 카테고리(야담/경제학). 무협과 **격리** |
 | `발음교정.py` / `.json` | TTS 보내기 직전 텍스트 교정(조사 씹힘 대응) |
@@ -131,10 +131,10 @@ VIDEO_DIR = "영상클립"     # 001.mp4 …  입력 영상(또는 이미지)
 ```python
 ENGINE_ST = "supertone"   # 2026-08-31 종료. 코드 경로만 남음
 ENGINE_EL = "elevenlabs"  # 감정 = v3 오디오 태그 [angry] 등
-ENGINE_TC = "typecast"    # 현재 기본. 감정 = 문맥 기반 smart 자동
-ENGINE_GM = "gemini"      # 감정 = 한국어 연기 지시문
+ENGINE_TC = "typecast"    # 감정 = 문맥 기반 smart 자동
+ENGINE_GM = "gemini"      # ★ 현재 기본. 감정 = 한국어 연기 지시문
 
-DIALOGUE_ENGINE  = ENGINE_TC   # 대사
+DIALOGUE_ENGINE  = ENGINE_GM   # 대사 (2026-10 Gemini 로 전환)
 NARRATION_ENGINE = ENGINE_EL   # 나레이션(주인님 목소리 클론) — 고정
 ```
 
@@ -253,19 +253,20 @@ e.run_tts("대본.txt", resume=True)      # ★ 실제 생성 — 크레딧 소�
 
 ## 11. 건드리면 안 되는 것 (불변 규칙)
 
-1. **`voice_map.json`의 기존 `voice_id` 값은 수정 금지.** 역할↔성우는 영구 고정이다.
+1. **나레이션은 주인님 목소리 클론으로 고정이다.** `NARRATION_ENGINE = ENGINE_EL`,
+   `voice_map.json`의 `나레이션` 항목에는 다른 엔진 voice_id 를 넣지 않는다.
+   대사 엔진을 바꿔도 나레이션은 영향받지 않아야 한다(서명이 분리돼 있다).
+2. **`voice_map.json`의 기존 `voice_id` 값은 수정 금지.** 역할↔성우는 영구 고정이다.
    필드 **추가**는 괜찮다.
-2. **`오디오/` `자막/` `매칭/` `완성본/`은 실제 산출물이다. 삭제 금지.**
-3. **코드를 바꾸면 `test_무협파이프라인.py`를 돌려서 100개 전부 통과하는지 확인할 것.**
+3. **`오디오/` `자막/` `매칭/` `완성본/`은 실제 산출물이다. 삭제 금지.**
+4. **코드를 바꾸면 `test_무협파이프라인.py`를 돌려서 100개 전부 통과하는지 확인할 것.**
    통과(종료코드 0) 전에는 완료로 보지 않는다.
-4. **TTS 실제 생성은 크레딧을 쓴다.** 승인 없이 `run_tts()`를 호출하지 말 것.
+5. **TTS 실제 생성은 크레딧을 쓴다.** 승인 없이 `run_tts()`를 호출하지 말 것.
    계획만 보려면 `tts_plan()` / `dry_run()`을 쓴다.
-5. **`app.build_dryrun()`은 읽기 전용이 아니다** — 입력을 `_작업대본.txt`에 덮어쓴다.
+6. **`app.build_dryrun()`은 읽기 전용이 아니다** — 입력을 `_작업대본.txt`에 덮어쓴다.
    테스트용으로 호출하면 작업 대본이 날아간다.
-6. 야담/경제학 파이프라인은 무협과 **격리**되어 있다. 새 카테고리는 기존 무협 코드를
+7. 야담/경제학 파이프라인은 무협과 **격리**되어 있다. 새 카테고리는 기존 무협 코드를
    수정하지 말고 **별도 모듈로 추가**한다.
-
----
 
 ## 12. 알려진 제약
 

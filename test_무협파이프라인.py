@@ -125,7 +125,7 @@ chk("타입캐스트: 감정 태그만 바뀌면 재생성 안 함(smart)", e.sc
 e.set_engines(dialogue=e.ENGINE_EL)
 chk("엔진 전환(타입캐스트↔ElevenLabs) 시 대사 서명 달라짐", e.scene_sig(e.load_segments(tf2)[0]) != _tc_a)
 e.set_engines(dialogue=_eng0)
-chk("기본 대사 엔진 = 타입캐스트", _eng0 == e.ENGINE_TC)
+chk("기본 대사 엔진 = Gemini", _eng0 == e.ENGINE_GM)
 # 단일 대사 장면은 parts 없음(기존 구조 불변)
 chk("단일 대사 장면엔 parts 없음(하위호환)", "parts" not in eng[0])
 open(tf2, "w", encoding="utf-8").write(multi)          # 원복(위에서 분노로 덮었음)
@@ -235,8 +235,8 @@ try:
     import app as _app
 
     chk("Gemini: ENGINE_GM 상수", getattr(e, "ENGINE_GM", None) == "gemini")
-    chk("Gemini: 대사 기본은 여전히 타입캐스트(기본값 안 바뀜)",
-        e.DIALOGUE_ENGINE == e.ENGINE_TC, e.DIALOGUE_ENGINE)
+    chk("Gemini: 대사 기본 엔진이 Gemini",
+        e.DIALOGUE_ENGINE == e.ENGINE_GM, e.DIALOGUE_ENGINE)
     chk("Gemini: 감정→연기지시 변환", gm.style_for("angry") and gm.style_for("evil"))
     chk("Gemini: 모르는 감정은 중립 폴백", gm.style_for("없는감정") == gm.EMO_STYLE["neutral"])
     chk("Gemini: 보이스 30종 목록", len(gm.list_voices()) == 30, str(len(gm.list_voices())))
@@ -277,7 +277,7 @@ try:
             _narr_before == _narr_after)
     finally:
         e.set_engines(dialogue=_prev)
-    chk("Gemini: 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_TC)
+    chk("Gemini: 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_GM)
 
     # UI 선택지
     chk("Gemini: app 라디오 선택지 존재", hasattr(_app, "DLG_ENGINE_GM"))
@@ -286,8 +286,8 @@ try:
         chk("Gemini: app 선택 → 엔진 반영",
             _app.apply_engine(_app.DLG_ENGINE_GM) == e.ENGINE_GM)
     finally:
-        _app.apply_engine(_app.DLG_ENGINE_TC)
-    chk("Gemini: UI 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_TC)
+        _app.apply_engine(_app.DLG_ENGINE_GM)
+    chk("Gemini: UI 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_GM)
 except Exception as _ex:
     chk("Gemini 대사 엔진 배선", False, f"{type(_ex).__name__}: {_ex}")
 
@@ -337,8 +337,8 @@ try:
         chk("GeminiUI: 타입캐스트는 tc 표시 유지", "tc_" in _r_tc, _r_tc)
         chk("GeminiUI: 엔진별 표시가 서로 다름", _r_gm != _r_tc)
     finally:
-        e.set_engines(dialogue=_prev2)
-    chk("GeminiUI: 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_TC)
+        e.set_engines(dialogue=e.ENGINE_GM)
+    chk("GeminiUI: 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_GM)
 except Exception as _ex:
     chk("Gemini 감정 직결 + UI 표시", False, f"{type(_ex).__name__}: {_ex}")
 

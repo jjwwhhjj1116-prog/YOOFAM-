@@ -56,16 +56,16 @@ ROLE_CHOICES = [(_role_label(r), r) for r in ROLES]
 
 CONFIRM_HINT = "🔧 대사 화자별 역할을 확인/변경한 뒤 **💾 매핑 확정**을 누르세요. (확정해야 ② 실제 제작이 열립니다)"
 # ② 실제 제작 버튼 라벨 — 활성/비활성이 한눈에 보이게 문구도 바뀜
-DLG_ENGINE_TC = "① 타입캐스트 (기본 · 감정 자동)"
+DLG_ENGINE_TC = "① 타입캐스트 (감정 자동)"
 DLG_ENGINE_EL = "② ElevenLabs (감정 태그)"
-DLG_ENGINE_GM = "③ Gemini (감정 연기 지시)"
+DLG_ENGINE_GM = "③ Gemini (기본 · 감정 연기 지시)"
 DLG_ENGINE_ST = "④ Supertone (2026-08-31 종료 · 사용불가)"
 
 def apply_engine(choice):
     """UI 선택 → 엔진 반영. 반환: 엔진명(로그용)."""
     eng = {DLG_ENGINE_TC: engine.ENGINE_TC, DLG_ENGINE_EL: engine.ENGINE_EL,
            DLG_ENGINE_GM: engine.ENGINE_GM,
-           DLG_ENGINE_ST: engine.ENGINE_ST}.get(choice, engine.ENGINE_TC)
+           DLG_ENGINE_ST: engine.ENGINE_ST}.get(choice, engine.ENGINE_GM)
     engine.set_engines(dialogue=eng)
     return eng
 
@@ -1237,7 +1237,7 @@ with gr.Blocks(title="올인원 영상 스튜디오") as demo:
         with gr.Column(visible=False) as w_s4:
             gr.Markdown("### 🎙️ 3단계 · TTS 제작 (① 미리보기 → ② 실제 제작)", elem_classes="step-h")
             dialogue_engine = gr.Radio(
-                [DLG_ENGINE_TC, DLG_ENGINE_EL, DLG_ENGINE_GM, DLG_ENGINE_ST], value=DLG_ENGINE_TC,
+                [DLG_ENGINE_TC, DLG_ENGINE_EL, DLG_ENGINE_GM, DLG_ENGINE_ST], value=DLG_ENGINE_GM,
                 label="대사 성우 엔진  (나레이션은 ElevenLabs 고정)",
                 info="기본 = 타입캐스트(감정은 앞뒤 장면 문맥으로 자동). Supertone은 2026-08-31 종료되어 사용 불가. "
                      "엔진을 바꾸면 대사 장면만 새로 생성됩니다(나레이션은 그대로).")

@@ -558,7 +558,7 @@ ENGINE_ST = "supertone"
 ENGINE_EL = "elevenlabs"
 ENGINE_TC = "typecast"        # 2026-09 대사 기본(캐릭터 연기·smart 감정)
 ENGINE_GM = "gemini"          # 2026-10 추가(감정을 한국어 연기지시로 전달)
-DIALOGUE_ENGINE  = ENGINE_TC   # 2026-09 대사 기본 = 타입캐스트(캐릭터 연기·smart 감정)
+DIALOGUE_ENGINE  = ENGINE_GM   # 2026-10 대사 기본 = Gemini(감정을 한국어 연기지시로 전달)
 NARRATION_ENGINE = ENGINE_EL
 
 _SCENE_CTX = {}      # seq → (앞 장면 텍스트, 뒤 장면 텍스트). 타입캐스트 smart 감정에 사용

@@ -91,3 +91,17 @@ _이미지_모션_적용안.md
 
 # 이 PC 전용 설정(코덱스에게 불필요)
 .claude/settings.local.json
+
+# ───────────────────────────────────────────────
+#  내 목소리 학습 데이터셋 — 예외적으로 올린다
+#  (나레이션 = ElevenLabs 목소리 클론. 대사 섞인 장면은 제외됨)
+# ───────────────────────────────────────────────
+!voice_dataset/
+!voice_dataset/**
+!voice_dataset/wavs/*.wav
+!voice_dataset/metadata.csv
+!voice_dataset/transcript.txt
+
+# 데이터셋 생성 스크립트는 올린다
+!_데이터셋_만들기.py
+!_데이터셋_분할.py

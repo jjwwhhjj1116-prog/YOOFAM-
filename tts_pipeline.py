@@ -579,6 +579,19 @@ def set_engines(dialogue=None, narration=None):
     if narration: NARRATION_ENGINE = narration
     return DIALOGUE_ENGINE, NARRATION_ENGINE
 
+# ── 역할별 대사 엔진 (2026-10) ─────────────────────────────────
+#   voice_map.json 의 역할에 "engine" 이 있으면 그 엔진으로, 없으면 전역 기본(DIALOGUE_ENGINE).
+#   왜 필요한가: Gemini 무료 티어는 모델당 하루 100요청. 대사를 전부 Gemini로 돌리면
+#   한 화(대사 ~100건)에 쿼터가 소진된다. 감정 연기가 꼭 필요한 역할만 Gemini,
+#   나머지는 타입캐스트로 보내 하루 한도 안에서 끝낸다.
+#   ★ 나레이션은 이 함수를 쓰지 않는다 — 항상 ElevenLabs 목소리 클론 고정.
+_DIALOGUE_ENGINES = (ENGINE_GM, ENGINE_TC, ENGINE_EL, ENGINE_ST)
+
+def dialogue_engine_for(role):
+    """역할 → 대사 엔진. voice_map.json 의 engine 값이 우선, 없으면 전역 기본."""
+    eng = (VOICE_MAP.get(role) or {}).get("engine")
+    return eng if eng in _DIALOGUE_ENGINES else DIALOGUE_ENGINE
+
 # ElevenLabs 대사용: 감정 style → v3 오디오 태그(대사 앞에 붙여 감정 연출)
 EL_DIALOGUE_MODEL = "eleven_v3"        # 오디오 태그 지원 · 한국어 지원 확인됨
 EL_EMOTION_TAGS = {
@@ -707,10 +720,14 @@ def _synth_one(seq, kind, speaker, emotion, text, out):
         if language_code:                                  # model_id/language_code는 convert 별도 인자
             kwargs["language_code"] = language_code
         _el_convert(kwargs, out)                           # 재시도·크레딧안내·빈파일 검사 포함
-    elif DIALOGUE_ENGINE == ENGINE_GM:
+        return out
+    # ── 대사: 역할별로 엔진이 다를 수 있다(voice_map.json 의 engine) ──
+    _role = resolve_role(speaker)                  # 화자이름 → 역할 (여기서 1회만 해석)
+    _eng = dialogue_engine_for(_role)             # 역할별 엔진(없으면 전역 기본)
+    if _eng == ENGINE_GM:
         # ── 대사를 Gemini 로 (감정 = 한국어 연기 지시문) ──
         import gemini_engine as gm
-        role = resolve_role(speaker)
+        role = _role
         style = resolve_style(role, emotion)          # 기존 감정 매핑 그대로 재사용
         vid = gm.voice_for(role, VOICE_MAP)
         if not vid:
@@ -723,10 +740,10 @@ def _synth_one(seq, kind, speaker, emotion, text, out):
               f"| 감정={emotion} → 지시='{act}' "
               f"| 엔진=Gemini · {gm.MODEL} → {os.path.basename(out)}")
         gm.synth(out, _pron(text, "dialogue"), vid, style=act, raw_style=True)
-    elif DIALOGUE_ENGINE == ENGINE_TC:
+    elif _eng == ENGINE_TC:
         # ── 대사를 타입캐스트로 (감정은 smart 자동 — 앞뒤 장면 문맥으로 판단) ──
         import typecast_engine as tc
-        role = resolve_role(speaker)
+        role = _role
         vid = tc.voice_for(role, VOICE_MAP)
         if not vid:
             raise ValueError(f"역할 '{role}'의 타입캐스트 voice_id(tc_voice_id)가 없습니다.")
@@ -735,9 +752,9 @@ def _synth_one(seq, kind, speaker, emotion, text, out):
         print(f"  {seq} | 화자={speaker} → 역할={role} → voice={vid} "
               f"| 감정=smart(문맥 자동) | 엔진=Typecast · {tc.MODEL} → {os.path.basename(out)}")
         tc.synth(out, text, vid, prev_text=prev_t, next_text=next_t, use_smart=True)
-    elif DIALOGUE_ENGINE == ENGINE_EL:
+    elif _eng == ENGINE_EL:
         # ── 대사를 ElevenLabs로 (Supertone 종료 대비) : 감정은 v3 오디오 태그로 ──
-        role = resolve_role(speaker)
+        role = _role
         style = resolve_style(role, emotion)              # 기존 감정 매핑 그대로 재사용
         vid = el_voice_for(role)
         if not vid:
@@ -758,7 +775,7 @@ def _synth_one(seq, kind, speaker, emotion, text, out):
                           speed=st.get("speed")))
         _el_convert(kwargs, out)
     else:
-        role = resolve_role(speaker)                     # 화자이름 → 역할
+        role = _role                                      # 화자이름 → 역할(위에서 해석)
         cfg = VOICE_MAP.get(role)                         # 역할 → voice_id
         if not cfg:
             raise ValueError(f"voice_map.json에 역할 '{role}' 매핑이 없습니다.")
@@ -941,14 +958,15 @@ def _part_sig(kind, speaker, emotion, text):
                 + _pron_tag(text, "narration"))
     role = role_of(speaker)
     cfg = VOICE_MAP.get(role, {})
-    if DIALOGUE_ENGINE == ENGINE_GM:
+    _eng = dialogue_engine_for(role)          # 역할별 엔진(없으면 전역 기본)
+    if _eng == ENGINE_GM:
         import gemini_engine as gm
         return (f"D|{text}|GM|{role}|{gm.voice_for(role, VOICE_MAP)}|{emotion}"
                 + _pron_tag(text, "dialogue"))
-    if DIALOGUE_ENGINE == ENGINE_TC:      # 엔진이 다르면 서명도 달라짐 → 그 장면만 재생성
+    if _eng == ENGINE_TC:      # 엔진이 다르면 서명도 달라짐 → 그 장면만 재생성
         import typecast_engine as tc
         return f"D|{text}|TC|{role}|{tc.voice_for(role, VOICE_MAP)}"   # 감정은 smart(문맥)라 미포함
-    if DIALOGUE_ENGINE == ENGINE_EL:
+    if _eng == ENGINE_EL:
         return (f"D|{text}|EL|{role}|{el_voice_for(role)}|{emotion}"
                 + _pron_tag(text, "dialogue"))
     speed = (cfg.get("settings") or {}).get("speed")

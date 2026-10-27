@@ -254,12 +254,13 @@ def compute_speakers(scenes):
 def speaker_rows(speakers):
     def _voice(role):
         cfg = engine.VOICE_MAP.get(role, {}) or {}
-        if engine.DIALOGUE_ENGINE == engine.ENGINE_TC:
-            return f"{cfg.get('_tc', '-')}  ({cfg.get('tc_voice_id', '-')})"
-        if engine.DIALOGUE_ENGINE == engine.ENGINE_EL:
-            return f"{cfg.get('_el', '-')}  ({cfg.get('el_voice_id', '-')})"
-        if engine.DIALOGUE_ENGINE == engine.ENGINE_GM:
-            return f"{cfg.get('gm_voice_id', '-')}  (Gemini)"
+        eng = engine.dialogue_engine_for(role)        # 역할별 고정 엔진(없으면 전역)
+        if eng == engine.ENGINE_TC:
+            return f"{cfg.get('_tc', '-')}  ({cfg.get('tc_voice_id', '-')})  [타입캐스트]"
+        if eng == engine.ENGINE_EL:
+            return f"{cfg.get('_el', '-')}  ({cfg.get('el_voice_id', '-')})  [ElevenLabs]"
+        if eng == engine.ENGINE_GM:
+            return f"{cfg.get('gm_voice_id', '-')}  [Gemini]"
         return cfg.get("voice_id", "-")
     return [[sp, cnt, auto, _voice(auto)] for sp, cnt, auto in speakers]
 
@@ -328,6 +329,7 @@ def build_dryrun(script_text):
         return [["—", "분석 실패", "장면 0개", "-", "-", "-", "-"]], "❌ 장면을 하나도 못 읽었습니다.", False
     rows, uncast, n_narr = [], set(), 0
     kc = {"정확매칭": 0, "근사폴백": 0, "neutral최후": 0}
+    eng_count = {}            # 엔진별 대사 호출 수 — Gemini 하루 100요청 한도 확인용
     fb_counts, neutral_scenes = {}, []
     _MARK = {"정확매칭": "✅ 정확", "근사폴백": "≈ 근사", "neutral최후": "⚠ neutral최후"}
     n_dial = 0
@@ -343,11 +345,13 @@ def build_dryrun(script_text):
                 role = engine.role_of(speaker)
                 if speaker not in engine.CHARACTER_CAST:
                     uncast.add(speaker)
-                if engine.DIALOGUE_ENGINE == engine.ENGINE_TC:   # 감정은 문맥으로 자동 판단
+                _eng = engine.dialogue_engine_for(role)        # 역할별 고정 엔진(없으면 전역)
+                eng_count[_eng] = eng_count.get(_eng, 0) + 1
+                if _eng == engine.ENGINE_TC:   # 감정은 문맥으로 자동 판단
                     tcn = (engine.VOICE_MAP.get(role, {}) or {}).get("_tc", "-")
                     rows.append([seq, speaker, role, emotion or "-", "smart 자동", f"🎭 {tcn}", "Typecast"])
                     continue
-                if engine.DIALOGUE_ENGINE == engine.ENGINE_GM:  # 감정 → 한국어 연기 지시문
+                if _eng == engine.ENGINE_GM:  # 감정 → 한국어 연기 지시문
                     import gemini_engine as _gm
                     _st = engine.resolve_style(role, emotion)
                     _vn = (engine.VOICE_MAP.get(role, {}) or {}).get("gm_voice_id", "-")
@@ -362,15 +366,25 @@ def build_dryrun(script_text):
                     neutral_scenes.append(seq)
                 rows.append([seq, speaker, role, emotion, final, _MARK[kind], "Supertone"])
     lines = [f"✅ **Dry-run 완료** · 총 {len(segs)}장면 · 대사/나레이션 조각 {n_narr + n_dial}개 (나레이션 {n_narr} / 대사 {n_dial})"]
-    if engine.DIALOGUE_ENGINE == engine.ENGINE_TC:
-        lines.append("🎭 **대사 = 타입캐스트 · 감정은 앞뒤 장면 문맥으로 자동 판단**(태그 강제 안 함) · 나레이션 = ElevenLabs")
-    elif engine.DIALOGUE_ENGINE == engine.ENGINE_GM:
-        lines.append("🎭 **대사 = Gemini · 감정을 한국어 연기 지시문으로 전달** · 나레이션 = ElevenLabs")
-    else:
+    _ENG_NM = {engine.ENGINE_GM: "Gemini", engine.ENGINE_TC: "타입캐스트",
+               engine.ENGINE_EL: "ElevenLabs", engine.ENGINE_ST: "Supertone"}
+    if eng_count:
+        lines.append("🎭 **대사 엔진(역할별 고정)** · "
+                     + " · ".join(f"{_ENG_NM.get(k, k)} {v}건"
+                                  for k, v in sorted(eng_count.items(), key=lambda x: -x[1]))
+                     + " · 나레이션 = ElevenLabs(내 목소리 클론)")
+        _gmn = eng_count.get(engine.ENGINE_GM, 0)
+        if _gmn > 100:
+            lines.append(f"🚨 **Gemini 호출 {_gmn}건 — 무료 티어 하루 100요청 초과.** "
+                         "voice_map.json 에서 일부 역할의 engine 을 typecast 로 바꾸세요.")
+        elif _gmn > 80:
+            lines.append(f"⚠️ **Gemini 호출 {_gmn}건** — 하루 한도 100요청까지 여유 {100 - _gmn}건. "
+                         "재생성·테스트를 하면 걸립니다.")
+    if sum(kc.values()):      # Supertone 계열 근사판정이 실제로 돌아간 경우만
         lines.append(f"매핑: 정확 {kc['정확매칭']} · 근사(계열유지) {kc['근사폴백']} · neutral최후 {kc['neutral최후']}")
     if fb_counts:
         lines.append("🔁 **폴백 감정어:** " + ", ".join(f"{e} {c}회" for e, c in sorted(fb_counts.items(), key=lambda x: -x[1])))
-    if engine.DIALOGUE_ENGINE not in (engine.ENGINE_TC, engine.ENGINE_GM):
+    if sum(kc.values()):
         if neutral_scenes:
             lines.append(f"⚠️ **neutral 최후폴백 장면(밋밋하게 나갈 대사):** {', '.join(neutral_scenes[:60])}")
         else:
@@ -1238,9 +1252,12 @@ with gr.Blocks(title="올인원 영상 스튜디오") as demo:
             gr.Markdown("### 🎙️ 3단계 · TTS 제작 (① 미리보기 → ② 실제 제작)", elem_classes="step-h")
             dialogue_engine = gr.Radio(
                 [DLG_ENGINE_TC, DLG_ENGINE_EL, DLG_ENGINE_GM, DLG_ENGINE_ST], value=DLG_ENGINE_GM,
-                label="대사 성우 엔진  (나레이션은 ElevenLabs 고정)",
-                info="기본 = 타입캐스트(감정은 앞뒤 장면 문맥으로 자동). Supertone은 2026-08-31 종료되어 사용 불가. "
-                     "엔진을 바꾸면 대사 장면만 새로 생성됩니다(나레이션은 그대로).")
+                label="대사 성우 엔진 (폴백)  ·  나레이션은 ElevenLabs 고정",
+                info="⚠️ 역할별 엔진은 voice_map.json 의 engine 값이 우선입니다 — "
+                     "남주·여주·악역1~4 = Gemini, 나머지 = 타입캐스트로 고정되어 있습니다. "
+                     "여기 선택은 engine 값이 없는 역할에만 적용됩니다. "
+                     "Supertone은 2026-08-31 종료되어 사용 불가. "
+                     "엔진을 바꾸면 그 엔진으로 가는 대사 장면만 새로 생성됩니다(나레이션은 그대로).")
             with gr.Row():
                 dryrun_btn = gr.Button("① 미리보기 (Dry-run · 크레딧 소모 없음)", interactive=False)
                 make_btn   = gr.Button(MAKE_BTN_OFF, variant="stop", interactive=False)

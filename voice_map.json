@@ -20,7 +20,8 @@
     "tc_voice_id": "tc_65e02cd537dfdac4257ca957",
     "_tc": "Risan Ji · 청년남 · 주인공",
     "gm_voice_id": "Orus",
-    "gm_note": "실측 감정반응 14.5st · 평온115Hz · 일치 98.1% · 남주 · 상"
+    "gm_note": "실측 감정반응 14.5st · 평온115Hz · 일치 98.1% · 남주 · 상",
+    "engine": "gemini"
   },
   "여주": {
     "voice_id": "f32a02422bd88da70fddb2",
@@ -29,7 +30,8 @@
     "tc_voice_id": "tc_667ce80314cb3a612d6959e8",
     "_tc": "Hyemin · 청년여 · 여주인공",
     "gm_voice_id": "Erinome",
-    "gm_note": "실측 감정반응 8.1st · 평온162Hz · 일치 97.4% · 여주1 · 중 · 여성 중 최고"
+    "gm_note": "실측 감정반응 8.1st · 평온162Hz · 일치 97.4% · 여주1 · 중 · 여성 중 최고",
+    "engine": "gemini"
   },
   "여주2": {
     "voice_id": "f4a2a3f41fc82de8616b84",
@@ -38,7 +40,8 @@
     "tc_voice_id": "tc_667ce80314cb3a612d6959e8",
     "_tc": "(폴백) Hyemin · 청년여 · 여주인공",
     "gm_voice_id": "Achernar",
-    "gm_note": "실측 감정반응 6.6st · 평온163Hz · 일치 97.8% · 여주2 · 중"
+    "gm_note": "실측 감정반응 6.6st · 평온163Hz · 일치 97.8% · 여주2 · 중",
+    "engine": "typecast"
   },
   "노인": {
     "voice_id": "db26b7e1720e0812dd8979",
@@ -47,7 +50,8 @@
     "tc_voice_id": "tc_67e38d8c771b5511659c4534",
     "_tc": "Jongdae · 노년남 · 노인/장로",
     "gm_voice_id": "Schedar",
-    "gm_note": "실측 감정반응 14.7st · 평온91Hz · 일치 98.1% · 노인1 · 상 · 호통치는 장로"
+    "gm_note": "실측 감정반응 14.7st · 평온91Hz · 일치 98.1% · 노인1 · 상 · 호통치는 장로",
+    "engine": "typecast"
   },
   "노인2": {
     "voice_id": "c3c0898fd41489a8e8919c",
@@ -56,7 +60,8 @@
     "tc_voice_id": "tc_685ca2dcfa58f44bdbe60d65",
     "_tc": "Wade · 중년남 · 장문인/천하제일인",
     "gm_voice_id": "Sadaltager",
-    "gm_note": "실측 감정반응 14.2st · 평온95Hz · 일치 97.0% · 노인2 · 상"
+    "gm_note": "실측 감정반응 14.2st · 평온95Hz · 일치 97.0% · 노인2 · 상",
+    "engine": "typecast"
   },
   "남자1": {
     "voice_id": "751ba7d5af37a49d68f2a7",
@@ -66,7 +71,8 @@
     "tc_voice_id": "tc_63f7167e54b37fb5326409d1",
     "_tc": "Touma Murata · 청년남 · 청년",
     "gm_voice_id": "Alnilam",
-    "gm_note": "실측 감정반응 14.2st · 평온108Hz · 일치 99.3% · 중년1 · 상"
+    "gm_note": "실측 감정반응 14.2st · 평온108Hz · 일치 99.3% · 중년1 · 상",
+    "engine": "typecast"
   },
   "남자2": {
     "voice_id": "12bab70236ce079bb0e4ea",
@@ -76,7 +82,8 @@
     "tc_voice_id": "tc_66d000ee0742c43c93a0ada1",
     "_tc": "Dohyun · 청년남 · 남주2",
     "gm_voice_id": "Zubenelgenubi",
-    "gm_note": "실측 감정반응 17.2st · 평온86Hz · 일치 100.0% · 청년1 · 상 · 묵직한 청년"
+    "gm_note": "실측 감정반응 17.2st · 평온86Hz · 일치 100.0% · 청년1 · 상 · 묵직한 청년",
+    "engine": "typecast"
   },
   "남자3": {
     "voice_id": "58662d5bd86d1b7837f197",
@@ -86,7 +93,8 @@
     "tc_voice_id": "tc_63622aaa4109052e8067e303",
     "_tc": "Homun Sim · 중년남 · 바보/코믹",
     "gm_voice_id": "Charon",
-    "gm_note": "실측 감정반응 10.0st · 평온113Hz · 일치 100.0% · 중년2 · 중"
+    "gm_note": "실측 감정반응 10.0st · 평온113Hz · 일치 100.0% · 중년2 · 중",
+    "engine": "typecast"
   },
   "남자4": {
     "voice_id": "a13c0466d81ceee983dbdb",
@@ -96,7 +104,8 @@
     "tc_voice_id": "tc_63f7167e54b37fb5326409d1",
     "_tc": "(폴백) Touma Murata · 청년남 · 청년",
     "gm_voice_id": "Iapetus",
-    "gm_note": "실측 감정반응 9.5st · 평온119Hz · 일치 100.0% · 청년2 · 중 · 밝은 청년"
+    "gm_note": "실측 감정반응 9.5st · 평온119Hz · 일치 100.0% · 청년2 · 중 · 밝은 청년",
+    "engine": "typecast"
   },
   "여전사": {
     "voice_id": "9e3cd9db97a12963af58d1",
@@ -105,7 +114,8 @@
     "tc_voice_id": "tc_60478557f12456064b353409",
     "_tc": "Valkyrie · 청년여 · 여전사",
     "gm_voice_id": "Vindemiatrix",
-    "gm_note": "실측 감정반응 5.5st · 평온151Hz · 일치 98.9% · 여전사 · 하중 · 여성 중 가장 낮은 음역"
+    "gm_note": "실측 감정반응 5.5st · 평온151Hz · 일치 98.9% · 여전사 · 하중 · 여성 중 가장 낮은 음역",
+    "engine": "typecast"
   },
   "여주3": {
     "voice_id": "b6c59d12355a00040d70a1",
@@ -115,7 +125,8 @@
     "tc_voice_id": "tc_667ce80314cb3a612d6959e8",
     "_tc": "(폴백) Hyemin · 청년여 · 여주인공",
     "gm_voice_id": "Despina",
-    "gm_note": "실측 감정반응 5.7st · 평온164Hz · 일치 98.9% · 여주3 · 하중"
+    "gm_note": "실측 감정반응 5.7st · 평온164Hz · 일치 98.9% · 여주3 · 하중",
+    "engine": "typecast"
   },
   "남자5": {
     "voice_id": "32d43349abb5df0c414df1",
@@ -125,7 +136,8 @@
     "tc_voice_id": "tc_66d000ee0742c43c93a0ada1",
     "_tc": "(폴백) Dohyun · 청년남 · 남주2",
     "gm_voice_id": "Achird",
-    "gm_note": "실측 감정반응 9.8st · 평온102Hz · 일치 100.0% · 청년3 · 중"
+    "gm_note": "실측 감정반응 9.8st · 평온102Hz · 일치 100.0% · 청년3 · 중",
+    "engine": "typecast"
   },
   "노인3": {
     "voice_id": "816bc977b4111a3034146a",
@@ -135,7 +147,8 @@
     "tc_voice_id": "tc_67e38d8c771b5511659c4534",
     "_tc": "(폴백) Jongdae · 노년남 · 노인/장로",
     "gm_voice_id": "Rasalgethi",
-    "gm_note": "실측 감정반응 8.7st · 평온112Hz · 일치 100.0% · 노인3 · 중"
+    "gm_note": "실측 감정반응 8.7st · 평온112Hz · 일치 100.0% · 노인3 · 중",
+    "engine": "typecast"
   },
   "노인4": {
     "voice_id": "8defc488f52f5efb9901f7",
@@ -145,7 +158,8 @@
     "tc_voice_id": "tc_685ca2dcfa58f44bdbe60d65",
     "_tc": "(폴백) Wade · 중년남 · 장문인/천하제일인",
     "gm_voice_id": "Gacrux",
-    "gm_note": "실측 감정반응 4.2st · 평온124Hz · 일치 98.1% · 노인4 · 하 · 담담한 노인 전용(의도적)"
+    "gm_note": "실측 감정반응 4.2st · 평온124Hz · 일치 98.1% · 노인4 · 하 · 담담한 노인 전용(의도적)",
+    "engine": "typecast"
   },
   "악역": {
     "voice_id": "0b3980faa5cb6675d40430",
@@ -157,7 +171,8 @@
     "tc_voice_id": "tc_63f7168722ebe13991293cde",
     "_tc": "Teal · 중년남 · 대악역",
     "gm_voice_id": "Enceladus",
-    "gm_note": "실측 감정반응 18.2st · 평온75Hz · 일치 100.0% · 악역1 · 상 · 음험하게 깔리는 결"
+    "gm_note": "실측 감정반응 18.2st · 평온75Hz · 일치 100.0% · 악역1 · 상 · 음험하게 깔리는 결",
+    "engine": "gemini"
   },
   "악역2": {
     "voice_id": "3ff478bf89c862a4a9ee69",
@@ -169,7 +184,8 @@
     "tc_voice_id": "tc_61095ebc03c0e5b98f8ba69c",
     "_tc": "Sindarin · 노년남 · 간사한 악역",
     "gm_voice_id": "Algieba",
-    "gm_note": "실측 감정반응 17.9st · 평온76Hz · 일치 99.6% · 악역2 · 상 · 런별 편차 큼(9.2~17.9)"
+    "gm_note": "실측 감정반응 17.9st · 평온76Hz · 일치 99.6% · 악역2 · 상 · 런별 편차 큼(9.2~17.9)",
+    "engine": "gemini"
   },
   "악역3": {
     "voice_id": "a929cf8981cbfd9b8e6eb3",
@@ -181,7 +197,8 @@
     "tc_voice_id": "tc_61095ebc03c0e5b98f8ba69c",
     "_tc": "(폴백) Sindarin · 노년남 · 간사한 악역",
     "gm_voice_id": "Algenib",
-    "gm_note": "실측 감정반응 13.6st · 평온101Hz · 일치 98.9% · 악역3 · 상 · 거친 결"
+    "gm_note": "실측 감정반응 13.6st · 평온101Hz · 일치 98.9% · 악역3 · 상 · 거친 결",
+    "engine": "gemini"
   },
   "악역4": {
     "voice_id": "a1a8c25b18309e96472109",
@@ -193,7 +210,8 @@
     "tc_voice_id": "tc_63f7168722ebe13991293cde",
     "_tc": "(폴백) Teal · 중년남 · 대악역",
     "gm_voice_id": "Pulcherrima",
-    "gm_note": "실측 감정반응 12.8st · 평온114Hz · 일치 97.4% · 악역4 · 중상 · 공격적인 결"
+    "gm_note": "실측 감정반응 12.8st · 평온114Hz · 일치 97.4% · 악역4 · 중상 · 공격적인 결",
+    "engine": "gemini"
   },
   "_설명2": "el_voice_id = 대사를 ElevenLabs로 만들 때 쓰는 voice_id (Supertone 종료 2026-08-31 대비). voice_id(슈퍼톤)는 무수정.",
   "_설명3": "tc_voice_id = 타입캐스트(대사) voice_id. Supertone voice_id·ElevenLabs el_voice_id는 그대로 보존.",
@@ -204,5 +222,6 @@
     "Fenrir": "2.8st — 연기 안 함",
     "Leda": "4.1st — 약함",
     "Umbriel": "10.6st — 쓸만하나 악역 슬롯 부족"
-  }
+  },
+  "_설명_엔진": "engine = 그 역할의 대사 엔진(역할별 고정). 주요 역할(남주·여주·악역1~4)만 Gemini — 감정 연기가 꼭 필요한 축. 나머지는 타입캐스트. 이유: Gemini 무료 티어는 모델당 하루 100요청이라 대사 전체를 Gemini로 돌리면 한 화에 쿼터가 소진된다. engine 이 없는 역할만 앱 UI의 전역 대사엔진 선택을 따른다. 나레이션은 engine=elevenlabs 고정(내 목소리 클론) — 바꾸지 말 것."
 }

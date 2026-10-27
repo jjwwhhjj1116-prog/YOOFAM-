@@ -116,7 +116,8 @@ VIDEO_DIR = "영상클립"     # 001.mp4 …  입력 영상(또는 이미지)
   "voice_id":    "...",        // Supertone (종료됨)
   "el_voice_id": "...",        // ElevenLabs
   "tc_voice_id": "tc_...",     // Typecast
-  "gm_voice_id": "Enceladus"   // Gemini
+  "gm_voice_id": "Enceladus",  // Gemini
+  "engine":      "gemini"      // ★ 이 역할이 실제로 쓰는 엔진 (역할별 고정)
 }
 ```
 
@@ -138,7 +139,32 @@ DIALOGUE_ENGINE  = ENGINE_GM   # 대사 (2026-10 Gemini 로 전환)
 NARRATION_ENGINE = ENGINE_EL   # 나레이션(주인님 목소리 클론) — 고정
 ```
 
-전환은 `set_engines(dialogue=...)` 또는 UI 라디오.
+### ★ 역할별 엔진 고정 (2026-10) — 전역 선택보다 우선
+
+대사는 **역할마다 엔진이 다르다.** `voice_map.json` 의 역할에 `"engine"` 이 있으면
+그 엔진으로 가고, 없는 역할만 전역 `DIALOGUE_ENGINE`(UI 라디오)을 따른다.
+
+```python
+def dialogue_engine_for(role):
+    eng = (VOICE_MAP.get(role) or {}).get("engine")
+    return eng if eng in _DIALOGUE_ENGINES else DIALOGUE_ENGINE
+```
+
+현재 배분 — **남주 · 여주 · 악역1~4 = Gemini**, 나머지 전부 **타입캐스트**.
+
+**왜 이렇게 쪼갰나:** Gemini 무료 티어는 `generate_requests_per_model_per_day` = **하루 100요청**.
+한 화의 대사가 약 100건이라 전부 Gemini로 보내면 한 화에 쿼터가 소진되고 429로 멈춘다.
+감정 연기가 꼭 필요한 주요 역할만 Gemini에 두면 한 화가 한도 안에서 끝난다
+(실측: 전체 104건 중 Gemini 85 · 타입캐스트 19).
+Dry-run 요약이 엔진별 호출 수를 세어 80건을 넘으면 경고를 띄운다.
+
+- 이 함수를 쓰는 곳: `_synth_one()`(실제 생성) · `_part_sig()`(서명) · `app.py` 표시 3곳.
+  **네 곳이 같은 함수를 써야 한다** — 서명과 생성이 엇갈리면 엉뚱한 장면이 재생성된다.
+- 나레이션은 이 함수를 **쓰지 않는다.** 항상 ElevenLabs 목소리 클론 고정.
+
+---
+
+전환은 `set_engines(dialogue=...)` 또는 UI 라디오(= `engine` 없는 역할의 폴백).
 분기점은 **`_synth_one()` 하나뿐**이다. 새 엔진을 붙이려면:
 
 1. `xxx_engine.py` 새로 만들고 `synth(out_path, text, voice_id, …)` 제공
@@ -147,6 +173,7 @@ NARRATION_ENGINE = ENGINE_EL   # 나레이션(주인님 목소리 클론) — �
 4. `_part_sig()`에 서명 형식 추가 ← **빠뜨리면 재생성이 안 걸린다**
 5. `voice_map.json`에 `xx_voice_id` 추가
 6. `app.py` 라디오에 선택지 추가 + **표시 경로 3곳**(매핑표/미리보기 행/요약)
+7. `_DIALOGUE_ENGINES` 튜플에 상수 추가 ← **빠뜨리면 역할별 `engine` 값이 무시된다**
 
 ### 감정 처리가 엔진마다 다르다
 
@@ -172,8 +199,9 @@ TTS 생성은 **돈이 든다.** 그래서 장면마다 "서명"을 저장해두
 ```python
 # 나레이션
 "N|{text}|{voice_id}|{speed}"
-# 대사(Gemini)
-"D|{text}|GM|{role}|{voice}|{emotion}"
+# 대사 — 엔진 표식은 역할별 엔진(dialogue_engine_for)에서 나온다
+"D|{text}|GM|{role}|{voice}|{emotion}"   # Gemini
+"D|{text}|TC|{role}|{voice}"             # Typecast (감정은 smart라 미포함)
 # 다중 화자
 "M|" + "||".join(파트별 서명)
 ```
@@ -245,7 +273,8 @@ UI를 거치지 않고 엔진만 쓰려면:
 import tts_pipeline as e
 segs = e.load_segments("대본.txt")      # 장면 파싱
 print(e.tts_plan("대본.txt"))           # 생성 없이 계획만(크레딧 0)
-e.set_engines(dialogue=e.ENGINE_GM)     # 대사 엔진 선택
+e.set_engines(dialogue=e.ENGINE_GM)     # 전역 폴백 엔진(engine 없는 역할만)
+e.dialogue_engine_for("악역")           # 역할이 실제로 쓸 엔진 확인
 e.run_tts("대본.txt", resume=True)      # ★ 실제 생성 — 크레딧 소모
 ```
 
@@ -259,13 +288,16 @@ e.run_tts("대본.txt", resume=True)      # ★ 실제 생성 — 크레딧 소�
 2. **`voice_map.json`의 기존 `voice_id` 값은 수정 금지.** 역할↔성우는 영구 고정이다.
    필드 **추가**는 괜찮다.
 3. **`오디오/` `자막/` `매칭/` `완성본/`은 실제 산출물이다. 삭제 금지.**
-4. **코드를 바꾸면 `test_무협파이프라인.py`를 돌려서 100개 전부 통과하는지 확인할 것.**
+4. **코드를 바꾸면 `test_무협파이프라인.py`를 돌려서 115개 전부 통과하는지 확인할 것.**
    통과(종료코드 0) 전에는 완료로 보지 않는다.
 5. **TTS 실제 생성은 크레딧을 쓴다.** 승인 없이 `run_tts()`를 호출하지 말 것.
    계획만 보려면 `tts_plan()` / `dry_run()`을 쓴다.
 6. **`app.build_dryrun()`은 읽기 전용이 아니다** — 입력을 `_작업대본.txt`에 덮어쓴다.
    테스트용으로 호출하면 작업 대본이 날아간다.
-7. 야담/경제학 파이프라인은 무협과 **격리**되어 있다. 새 카테고리는 기존 무협 코드를
+7. **역할별 엔진(`voice_map.json` 의 `engine`)을 바꾸면 그 역할이 나오는 장면이 전부 재생성된다.**
+   서명에 엔진 표식이 들어가기 때문이다. 바꾸기 전에 `tts_plan()` 으로 범위를 확인할 것.
+   또 Gemini 로 옮길 때는 **하루 100요청** 한도를 넘지 않는지 Dry-run 요약의 엔진별 호출 수를 볼 것.
+8. 야담/경제학 파이프라인은 무협과 **격리**되어 있다. 새 카테고리는 기존 무협 코드를
    수정하지 말고 **별도 모듈로 추가**한다.
 
 ## 12. 알려진 제약

@@ -110,18 +110,35 @@ chk("다중: 파트1=청허진인/경악", s1["parts"][0]["speaker"] == "청허�
 chk("다중: 파트2=당무극/차가움", s1["parts"][1]["speaker"] == "당무극" and s1["parts"][1]["emotion"] == "차가움")
 chk("다중: 파트 텍스트에 태그 안 샘", all("[" not in p["text"] and "\"" not in p["text"] for p in s1["parts"]))
 chk("다중: 장면2 = 나레이션+대사 혼합", [p["kind"] for p in (mseg[1].get("parts") or [])] == ["narration", "dialogue"])
+
+# 역할별 엔진 고정(voice_map.json 의 engine)을 잠시 걷어내는 헬퍼.
+# 전역 엔진 선택만 보는 기존 테스트들은 이 안에서 돌린다.
+import contextlib
+@contextlib.contextmanager
+def _전역엔진만():
+    saved = {}
+    for r, cfg in e.VOICE_MAP.items():
+        if isinstance(cfg, dict) and r != "나레이션" and "engine" in cfg:
+            saved[r] = cfg.pop("engine")
+    try:
+        yield
+    finally:
+        for r, v in saved.items():
+            e.VOICE_MAP[r]["engine"] = v
+
 _eng0 = e.DIALOGUE_ENGINE
-# 태그로 감정을 정하는 엔진(ElevenLabs/Supertone): 감정 태그가 바뀌면 재생성해야 함
-e.set_engines(dialogue=e.ENGINE_EL)
-sig_a = e.scene_sig(s1)
-open(tf2, "w", encoding="utf-8").write(multi.replace("차가움", "분노"))
-chk("다중: 파트 감정 바뀌면 서명 달라짐(태그 엔진·재생성)", e.scene_sig(e.load_segments(tf2)[0]) != sig_a)
-# 타입캐스트(smart): 감정은 문맥으로 자동 → 태그만 바뀌면 재생성 불필요(크레딧 절약)
-e.set_engines(dialogue=e.ENGINE_TC)
-open(tf2, "w", encoding="utf-8").write(multi)
-_tc_a = e.scene_sig(e.load_segments(tf2)[0])
-open(tf2, "w", encoding="utf-8").write(multi.replace("차가움", "분노"))
-chk("타입캐스트: 감정 태그만 바뀌면 재생성 안 함(smart)", e.scene_sig(e.load_segments(tf2)[0]) == _tc_a)
+with _전역엔진만():          # 역할별 고정을 끄고 전역 엔진 동작만 검사
+    # 태그로 감정을 정하는 엔진(ElevenLabs/Supertone): 감정 태그가 바뀌면 재생성해야 함
+    e.set_engines(dialogue=e.ENGINE_EL)
+    sig_a = e.scene_sig(s1)
+    open(tf2, "w", encoding="utf-8").write(multi.replace("차가움", "분노"))
+    chk("다중: 파트 감정 바뀌면 서명 달라짐(태그 엔진·재생성)", e.scene_sig(e.load_segments(tf2)[0]) != sig_a)
+    # 타입캐스트(smart): 감정은 문맥으로 자동 → 태그만 바뀌면 재생성 불필요(크레딧 절약)
+    e.set_engines(dialogue=e.ENGINE_TC)
+    open(tf2, "w", encoding="utf-8").write(multi)
+    _tc_a = e.scene_sig(e.load_segments(tf2)[0])
+    open(tf2, "w", encoding="utf-8").write(multi.replace("차가움", "분노"))
+    chk("타입캐스트: 감정 태그만 바뀌면 재생성 안 함(smart)", e.scene_sig(e.load_segments(tf2)[0]) == _tc_a)
 e.set_engines(dialogue=e.ENGINE_EL)
 chk("엔진 전환(타입캐스트↔ElevenLabs) 시 대사 서명 달라짐", e.scene_sig(e.load_segments(tf2)[0]) != _tc_a)
 e.set_engines(dialogue=_eng0)
@@ -329,18 +346,84 @@ try:
     # UI 표시: 엔진별로 성우 칼럼이 달라야 한다
     _prev2 = e.DIALOGUE_ENGINE
     try:
-        e.set_engines(dialogue=e.ENGINE_GM)
-        _r_gm = _app2.speaker_rows([("혈마존", 3, "악역")])[0][3]
+        with _전역엔진만():       # 전역 선택만 보는 종전 동작
+            e.set_engines(dialogue=e.ENGINE_GM)
+            _r_gm = _app2.speaker_rows([("혈마존", 3, "악역")])[0][3]
+            e.set_engines(dialogue=e.ENGINE_TC)
+            _r_tc = _app2.speaker_rows([("혈마존", 3, "악역")])[0][3]
+            chk("GeminiUI: 매핑표가 gm_voice_id 표시", "Gemini" in _r_gm, _r_gm)
+            chk("GeminiUI: 타입캐스트는 tc 표시 유지", "tc_" in _r_tc, _r_tc)
+            chk("GeminiUI: 엔진별 표시가 서로 다름", _r_gm != _r_tc)
+        # 역할별 고정(악역=gemini)은 전역이 TC여도 Gemini 표시여야 한다
         e.set_engines(dialogue=e.ENGINE_TC)
-        _r_tc = _app2.speaker_rows([("혈마존", 3, "악역")])[0][3]
-        chk("GeminiUI: 매핑표가 gm_voice_id 표시", "Gemini" in _r_gm, _r_gm)
-        chk("GeminiUI: 타입캐스트는 tc 표시 유지", "tc_" in _r_tc, _r_tc)
-        chk("GeminiUI: 엔진별 표시가 서로 다름", _r_gm != _r_tc)
+        chk("역할고정UI: 악역은 전역 TC여도 Gemini 표시",
+            "Gemini" in _app2.speaker_rows([("혈마존", 3, "악역")])[0][3])
+        chk("역할고정UI: 노인2는 전역 GM이어도 타입캐스트 표시",
+            (e.set_engines(dialogue=e.ENGINE_GM),
+             "tc_" in _app2.speaker_rows([("무명노인", 3, "노인2")])[0][3])[1])
     finally:
         e.set_engines(dialogue=e.ENGINE_GM)
     chk("GeminiUI: 테스트 후 엔진 원복", e.DIALOGUE_ENGINE == e.ENGINE_GM)
 except Exception as _ex:
     chk("Gemini 감정 직결 + UI 표시", False, f"{type(_ex).__name__}: {_ex}")
+
+
+# ── 역할별 대사 엔진 (voice_map.json 의 engine) ─────────────────
+#   왜 중요한가: Gemini 무료 티어는 모델당 하루 100요청. 대사를 전부 Gemini로 보내면
+#   한 화(대사 ~100건)에 쿼터가 소진된다. 주요 역할만 Gemini로 묶어 한도 안에서 끝낸다.
+try:
+    GM_ROLES = {"남주", "여주", "악역", "악역2", "악역3", "악역4"}
+    _dial_roles = [r for r, c in e.VOICE_MAP.items()
+                   if isinstance(c, dict) and not r.startswith("_") and r != "나레이션"]
+
+    chk("역할엔진: dialogue_engine_for 존재", callable(getattr(e, "dialogue_engine_for", None)))
+    chk("역할엔진: 모든 대사 역할에 engine 지정됨",
+        all("engine" in e.VOICE_MAP[r] for r in _dial_roles),
+        str([r for r in _dial_roles if "engine" not in e.VOICE_MAP[r]]))
+    chk("역할엔진: 주요 역할 = Gemini",
+        all(e.dialogue_engine_for(r) == e.ENGINE_GM for r in GM_ROLES),
+        str({r: e.dialogue_engine_for(r) for r in GM_ROLES}))
+    chk("역할엔진: 그 외 = 타입캐스트",
+        all(e.dialogue_engine_for(r) == e.ENGINE_TC
+            for r in _dial_roles if r not in GM_ROLES),
+        str({r: e.dialogue_engine_for(r) for r in _dial_roles if r not in GM_ROLES}))
+
+    # 전역 선택보다 역할별 고정이 우선
+    _p = e.DIALOGUE_ENGINE
+    try:
+        e.set_engines(dialogue=e.ENGINE_TC)
+        chk("역할엔진: 전역 TC여도 악역은 Gemini", e.dialogue_engine_for("악역") == e.ENGINE_GM)
+        e.set_engines(dialogue=e.ENGINE_EL)
+        chk("역할엔진: 전역 EL여도 노인2는 타입캐스트", e.dialogue_engine_for("노인2") == e.ENGINE_TC)
+        chk("역할엔진: engine 없는 역할은 전역 폴백",
+            e.dialogue_engine_for("있을수없는역할") == e.ENGINE_EL)
+    finally:
+        e.set_engines(dialogue=_p)
+    chk("역할엔진: 테스트 후 전역 원복", e.DIALOGUE_ENGINE == _p)
+
+    # ★ 나레이션은 역할별 엔진과 무관하게 내 목소리 클론 고정
+    chk("역할엔진: 나레이션 engine 은 elevenlabs 불변",
+        e.VOICE_MAP["나레이션"].get("engine") == "elevenlabs")
+    chk("역할엔진: NARRATION_ENGINE 불변", e.NARRATION_ENGINE == e.ENGINE_EL)
+
+    # 서명(_part_sig)이 역할별 엔진을 반영해야 — 안 그러면 엉뚱한 장면이 재생성된다
+    _sig_gm = e.scene_sig({"seq": "001", "kind": "dialogue", "speaker": "혈마존",
+                           "emotion": "분노", "text": "죽어라"})
+    _sig_tc = e.scene_sig({"seq": "001", "kind": "dialogue", "speaker": "무명노인",
+                           "emotion": "분노", "text": "죽어라"})
+    chk("역할엔진: 악역 서명은 GM 표식", "|GM|" in _sig_gm, _sig_gm)
+    chk("역할엔진: 노인2 서명은 TC 표식", "|TC|" in _sig_tc, _sig_tc)
+
+    # 전역 엔진을 바꿔도 고정된 역할의 서명은 안 바뀐다 → 불필요한 재생성 없음
+    try:
+        e.set_engines(dialogue=e.ENGINE_EL)
+        chk("역할엔진: 전역 변경이 고정 역할 서명을 건드리지 않음",
+            e.scene_sig({"seq": "001", "kind": "dialogue", "speaker": "혈마존",
+                         "emotion": "분노", "text": "죽어라"}) == _sig_gm)
+    finally:
+        e.set_engines(dialogue=_p)
+except Exception as _ex:
+    chk("역할별 대사 엔진", False, f"{type(_ex).__name__}: {_ex}")
 
 # ── 결과 ──
 print("=" * 60)

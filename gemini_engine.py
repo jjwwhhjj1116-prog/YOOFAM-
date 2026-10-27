@@ -194,6 +194,48 @@ def _pcm_to_mp3(pcm, out_path):
             pass
 
 
+def _quota_message(ex, msg):
+    """429 를 사람이 읽을 수 있게 — 어느 쿼터가 얼마나 차서 언제 풀리는지.
+       하루 한도는 자정까지 막히는 벽이 아니라 롤링 윈도우다. retryDelay 를 반드시 보여준다.
+       (안 보여주면 '내일까지 기다려야 하나' 하고 하루를 버린다 — 실제로 그랬다.)"""
+    import re
+    지표 = 한도 = 모델 = 대기 = None
+    d = getattr(ex, "details", None)
+    if isinstance(d, dict):
+        for det in (d.get("error") or {}).get("details") or []:
+            t = det.get("@type", "")
+            if t.endswith("QuotaFailure"):
+                v = (det.get("violations") or [{}])[0]
+                지표 = v.get("quotaMetric", "").split("/")[-1] or None
+                한도 = v.get("quotaValue")
+                모델 = (v.get("quotaDimensions") or {}).get("model")
+            elif t.endswith("RetryInfo"):
+                대기 = det.get("retryDelay")
+    if 대기 is None:                                   # 본문의 "retry in 6m59.3s" 폴백
+        m = re.search(r"retry in ([\dhms.]+)", msg, re.I)
+        대기 = m.group(1) if m else None
+    초 = None
+    if 대기:
+        m = re.fullmatch(r"(?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s?)?", str(대기).strip())
+        if m:
+            h, mi, se = (float(x) if x else 0 for x in m.groups())
+            초 = int(h * 3600 + mi * 60 + se)
+    부분 = ["💳 Gemini 쿼터 소진(429)"]
+    if 지표:
+        부분.append("한도: %s = %s%s" % (지표, 한도 or "?",
+                                      (" · 모델 %s" % 모델) if 모델 else ""))
+    if 초 is not None:
+        부분.append("⏱ %s 뒤에 다시 됩니다 (%d분 %d초). 하루 한도는 자정까지 막히는 벽이 "
+                    "아니라 롤링 윈도우라, 24시간 전 호출이 빠지면서 자리가 조금씩 돌아옵니다."
+                    % (대기, 초 // 60, 초 % 60))
+    else:
+        부분.append("재시도 시각을 응답에서 찾지 못했습니다.")
+    부분.append("②를 다시 누르면 남은 장면부터 이어서 생성됩니다. "
+                "한 번에 끝내려면 Tier 를 올리거나(결제 연동), "
+                "voice_map.json 에서 일부 역할의 engine 을 typecast 로 옮기세요.")
+    return "  ".join(부분) + "  (원본: " + msg[:200] + ")"
+
+
 def synth(out_path, text, voice_id, style=None, retries=5, raw_style=False):
     """대사 1건 생성.
        raw_style=False → style 은 감정 style 키(angry/evil/firm…)
@@ -227,12 +269,9 @@ def synth(out_path, text, voice_id, style=None, retries=5, raw_style=False):
         except Exception as ex:
             msg = str(ex)
             low = msg.lower()
-            # 쿼터 소진은 재시도해도 소용없다 — 원인을 분명히 알리고 중단
+            # 쿼터 소진은 재시도해도 소용없다 — 지표·한도·재시도 시각을 그대로 알리고 중단
             if "resource_exhausted" in low or "429" in msg or "quota" in low:
-                raise RuntimeError(
-                    "💳 Gemini 무료 쿼터 소진(429). Google Cloud 결제를 연동하거나 "
-                    "쿼터가 리셋된 뒤 ②를 다시 누르면 남은 장면부터 이어서 생성됩니다. "
-                    "(원본: " + msg[:150] + ")")
+                raise RuntimeError(_quota_message(ex, msg))
             if any(t in low for t in ("permission", "api key", "unauthenticated", "401", "403")):
                 raise RuntimeError("Gemini 인증 실패 — GEMINI_API_KEY 확인 필요. " + msg[:150])
             transient = any(t in low for t in

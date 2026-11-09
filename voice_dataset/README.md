@@ -36,7 +36,7 @@ voice_dataset/
 ├─ subtitles/
 │   └─ ng01/
 │       ├─ 001.srt … 284.srt      ← 장면별 자막 (283개)
-│       └─ _목록.tsv              ← 장면 / 자막줄 / 초 / 원문 대조표
+│       └─ _index.tsv             ← 장면 / 자막줄 / 초 / 원문 대조표
 └─ README.md
 ```
 

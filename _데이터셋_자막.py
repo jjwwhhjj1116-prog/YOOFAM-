@@ -129,7 +129,7 @@ def main():
         print("  → 이번에 만든 자막 폴더를 지웠습니다.")
         return 3
 
-    idx = os.path.join(dst, "_목록.tsv")
+    idx = os.path.join(dst, "_index.tsv")   # ASCII 이름 — raw URL 로 바로 받게
     with io.open(idx, "w", encoding="utf-8") as f:
         f.write("# %s 나레이션 자막 목록 — 오디오에서 직접 정렬해 만든 것(음성과 일치 보장).\n" % 화)
         f.write("# 자막 : voice_dataset/subtitles/%s/<장면>.srt\n" % 화)

@@ -83,9 +83,18 @@ def main():
         만든것.append((p, n, "원문(정본)"))
 
     # ── 지난 화: metadata.csv 에서 복원 ──────────────────────
+    #   ★ 이미 '정본' TSV 가 있으면 건드리지 않는다. 복원본으로 덮으면
+    #     대본에서 그대로 꺼낸 원문(초 칼럼 포함)을 잃는다.
     for ep in sorted(모음):
         if ep == 현재화:
             continue
+        p0 = os.path.join(SCENES, "%s_narration.tsv" % ep)
+        if os.path.exists(p0):
+            머리 = io.open(p0, encoding="utf-8").readline()
+            if "정본" in 머리:
+                만든것.append((p0, sum(1 for _ in io.open(p0, encoding="utf-8")) - 4,
+                             "정본 — 그대로 보존(건너뜀)"))
+                continue
         rows = []
         for seq in sorted(모음[ep]):
             조각 = sorted(모음[ep][seq])

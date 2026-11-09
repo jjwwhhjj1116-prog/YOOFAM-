@@ -65,6 +65,30 @@ def merge(cues):
     return merged
 
 
+def _매니페스트_지문(path):
+    """매니페스트 내용의 해시. 작업 중에 바뀌면(= TTS 가 돌아 오디오가 교체되면)
+       글자와 음성이 다른 버전으로 짝지어진다. 실제로 그렇게 178/198 장면이 어긋났다."""
+    import hashlib
+    try:
+        return hashlib.sha1(io.open(path, "rb").read()).hexdigest()
+    except Exception:
+        return None
+
+
+def _지문_검사(path, before, 무엇):
+    """작업 전후 지문을 비교. 달라졌으면 결과를 믿을 수 없으니 알리고 실패시킨다."""
+    after = _매니페스트_지문(path)
+    if before != after:
+        print()
+        print("=" * 64)
+        print("  [중단] 작업 중에 오디오가 다시 생성됐습니다.")
+        print("  매니페스트가 바뀌어서 %s의 글자와 음성이 어긋납니다." % 무엇)
+        print("  앱에서 TTS 제작(②)이 끝난 뒤에 다시 돌리세요.")
+        print("=" * 64)
+        return False
+    return True
+
+
 def main():
     prefix = (sys.argv[1] if len(sys.argv) > 1 else "").strip()
     if not prefix:
@@ -75,6 +99,7 @@ def main():
     if not os.path.exists(man_path):
         print("매니페스트가 없습니다:", man_path)
         return 1
+    지문0 = _매니페스트_지문(man_path)        # 작업 중 오디오 교체 감지용
     m = json.load(io.open(man_path, encoding="utf-8"))
     os.makedirs(WAVS, exist_ok=True)
 
@@ -125,6 +150,14 @@ def main():
             rows.append((name, txt, dur(dst)))
         n_scene += 1
     print("\r" + " " * 56 + "\r", end="")
+
+    # ★ 쓰기 전에 검사 — 어긋난 짝을 metadata.csv 에 남기면 되돌리기 어렵다
+    if not _지문_검사(man_path, 지문0, "클립"):
+        for name, _, _ in rows:
+            try: os.remove(os.path.join(WAVS, name + ".wav"))
+            except OSError: pass
+        print("  → 이번에 만든 wav %d개를 지웠습니다. metadata.csv 는 손대지 않았습니다." % len(rows))
+        return 3
 
     # 기존 줄 보존 + 뒤에 추가
     with io.open(META, "a", encoding="utf-8") as f:
